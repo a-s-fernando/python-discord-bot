@@ -1,7 +1,7 @@
 """Simple test discord bot using py-cord and random fox api"""
 import json
 import logging
-import requests
+import aiohttp
 import discord
 from discord.ext import commands
 
@@ -34,9 +34,10 @@ async def hello(ctx):
 @bot.slash_command(guild_ids=[1081343021775339610])
 async def random_fox(ctx):
     """Respond with a random image of a fox taken from the random fox api"""
-    req = requests.get("https://randomfox.ca/floof")
-    image = req.json()['image']
-    await ctx.respond(image)
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://randomfox.ca/floof") as req:
+            response = await req.json()
+            await ctx.respond(response['image'])
 
 
 with open('key.json') as f:
